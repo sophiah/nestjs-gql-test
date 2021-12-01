@@ -1,12 +1,12 @@
 type Author {
-    id: ID!
-    name: String!
+    author_id: ID
+    name: String
     book_ids: [ID!]
 }
 
 type Query {
-    authors: [Author!]!
-    author(id: ID!): Author!
+    authors: [Author!]
+    author(author_id: ID!): Author
 }
 
 # type Mutation {

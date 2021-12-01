@@ -1,27 +1,29 @@
-import { Args, Resolver, Query, Context } from '@nestjs/graphql';
+import { Inject } from '@nestjs/common';
+import { Args, Resolver, Query, Context, ResolveReference, CONTEXT, ResolveField, Parent } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
-import DataLoader from 'dataloader';
 import { lastValueFrom, take } from 'rxjs';
-import { Author, IQuery } from 'src/gql/bookstoreDO';
+import { Author, Book, IQuery } from 'src/gql/bookstoreDO';
 import { AuthorService } from './author.service';
 
 @Resolver('Author')
 export class AuthorResolver /* implements IQuery /* */ {
-  constructor(private readonly authorService: AuthorService) {}
+  constructor(
+    private readonly authorService: AuthorService,
+    @Inject(CONTEXT) private httpContext,
+    ) {}
 
-  @Query()
+  @Query('author')
   async author(
-    @Args('id') id: string,
-    @Context('authorDataLoader') authorLoader: DataLoader<string, Author>,
+    @Args('author_id') id: string
   ): Promise<Author> {
     try {
-      return authorLoader.load(id);
+      return this.httpContext['authorDataLoader'].load(id);
     } catch (err) {
       throw new UserInputError(err.message);
     }
   }
 
-  @Query()
+  @Query('authors')
   async authors(): Promise<Author[]> {
     try {
       return await lastValueFrom(
@@ -31,4 +33,10 @@ export class AuthorResolver /* implements IQuery /* */ {
       throw new UserInputError(err.message);
     }
   }
+
+  @ResolveField('books')
+  books(@Parent() author: Author) {
+    return this.httpContext['bookDataLoader'].load(author.book_ids);
+  }
+
 }

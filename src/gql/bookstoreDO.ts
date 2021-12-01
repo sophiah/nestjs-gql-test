@@ -14,27 +14,27 @@ export enum MutationType {
 }
 
 export class Author {
-    id: string;
-    name: string;
+    author_id?: Nullable<string>;
+    name?: Nullable<string>;
     book_ids?: Nullable<string[]>;
-    bookList?: Nullable<Book[]>;
+    books?: Nullable<Book[]>;
 }
 
 export abstract class IQuery {
-    abstract authors(): Author[] | Promise<Author[]>;
+    abstract authors(): Nullable<Author[]> | Promise<Nullable<Author[]>>;
 
-    abstract author(id: string): Author | Promise<Author>;
+    abstract author(author_id: string): Nullable<Author> | Promise<Nullable<Author>>;
 
-    abstract books(): Book[] | Promise<Book[]>;
+    abstract books(): Nullable<Book[]> | Promise<Nullable<Book[]>>;
 
-    abstract book(id: string): Book | Promise<Book>;
+    abstract book(book_id: string): Nullable<Book> | Promise<Nullable<Book>>;
 }
 
 export class Book {
-    id: string;
+    book_id: string;
     name: string;
     author_ids?: Nullable<string[]>;
-    authorList?: Nullable<Author[]>;
+    authors: Author[];
 }
 
 type Nullable<T> = T | null;

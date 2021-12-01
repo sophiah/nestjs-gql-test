@@ -1,13 +1,12 @@
 type Book {
-    id: ID!
+    book_id: ID!
     name: String!
-    # publisher: Publisher!
     author_ids: [ID!]
 }
 
 type Query {
-    books: [Book!]!
-    book(id: ID!): Book!
+    books: [Book!]
+    book(book_id: ID!): Book
 }
 
 # type Mutation {

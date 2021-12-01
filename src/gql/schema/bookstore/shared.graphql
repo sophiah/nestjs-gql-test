@@ -3,13 +3,3 @@ enum MutationType {
     UPDATED
     DELETED
 }
-
-extend type Book @key(fields: "id") {
-  id: ID @external
-  authorList: [Author!] @provides(fields: "author_ids")
-}
-
-extend type Author @key(fields: "id") {
-  id: ID @external
-  bookList: [Book!] @provides(fields: "book_ids")
-}
