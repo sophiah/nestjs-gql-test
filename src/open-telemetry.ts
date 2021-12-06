@@ -1,7 +1,7 @@
 'use strict';
 
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { GraphQLInstrumentation } from '@opentelemetry/instrumentation-graphql';
+// import { GraphQLInstrumentation } from '@opentelemetry/instrumentation-graphql';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
@@ -23,10 +23,10 @@ provider.register();
 
 registerInstrumentations({
   instrumentations: [
-    new GraphQLInstrumentation({
-      allowValues: true,
-      depth: 5,
-      mergeItems: true,
-    }),
+    // new GraphQLInstrumentation({
+    //   allowValues: true,
+    //   depth: 5,
+    //   mergeItems: true,
+    // }),
   ],
 });

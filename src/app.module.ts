@@ -5,8 +5,10 @@ import { BookstoreModule } from './resolvers/bookstore/bookstore.module';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.service';
 import { authorDataLoader, AuthorService } from './resolvers/bookstore/author/author.service';
+import { OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
 @Module({
   imports: [
+    OpenTelemetryModule.forRoot(),
     // register graphql module
     GraphQLModule.forRootAsync({
       imports: [BookstoreModule],
