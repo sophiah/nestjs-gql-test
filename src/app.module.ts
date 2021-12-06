@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
-import { GraphQLFederationModule, GraphQLGatewayModule, GraphQLModule } from '@nestjs/graphql';
+import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { BookstoreModule } from './resolvers/bookstore/bookstore.module';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.service';
 import { authorDataLoader, AuthorService } from './resolvers/bookstore/author/author.service';
 import { OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
+import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 @Module({
   imports: [
-    OpenTelemetryModule.forRoot(),
+    OpenTelemetryModule.forRoot({
+      spanProcessor: new SimpleSpanProcessor(new ConsoleSpanExporter())
+    }),
     // register graphql module
     GraphQLModule.forRootAsync({
       imports: [BookstoreModule],

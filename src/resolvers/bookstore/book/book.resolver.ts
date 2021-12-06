@@ -1,3 +1,4 @@
+import { Span } from '@metinseylan/nestjs-opentelemetry';
 import { Inject } from '@nestjs/common';
 import { Args, Resolver, Query, ResolveField, Parent, ResolveReference, CONTEXT } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
@@ -5,14 +6,14 @@ import { lastValueFrom, take } from 'rxjs';
 import { Author, Book } from 'src/gql/bookstoreDO';
 import { BookService } from './book.service';
 
-@Resolver(() => Book)
+@Resolver('Book')
 export class BookResolver /* implements IQuery /* */ {
   constructor(
     private readonly bookService: BookService,
     @Inject(CONTEXT) private httpContext,
     ) {}
 
-  @Query(() => Book, {name: 'book'})
+  @Query('book')
   async getBook(
     @Args('book_id') id: string
   ): Promise<Book> {
@@ -23,7 +24,7 @@ export class BookResolver /* implements IQuery /* */ {
     }
   }
 
-  @Query(() => [Book], {name: 'books'})
+  @Query('books')
   async getBooks(): Promise<Book[]> {
     try {
       return await lastValueFrom(
@@ -33,7 +34,6 @@ export class BookResolver /* implements IQuery /* */ {
       throw new UserInputError(err.message);
     }
   }
-
 
   @ResolveField('authors')
   async authorsField(

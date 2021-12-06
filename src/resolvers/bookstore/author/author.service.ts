@@ -4,6 +4,7 @@ import * as DataLoader from 'dataloader';
 import { lastValueFrom, Observable, of, take } from 'rxjs';
 import { Author, Book } from 'src/gql/bookstoreDO';
 import { getRandomArray, mapFromArray, newId } from 'src/utils';
+import { Span } from '@metinseylan/nestjs-opentelemetry';
 
 
 export function authorDataLoader(authorService: AuthorService) {
@@ -25,6 +26,7 @@ export class AuthorService implements OnModuleInit {
     console.log('[Init] Author Service')
   }
 
+  @Span()
   public getAuthors(ids: string[]): Observable<Author[]> {
     return of(ids.map( a => <Author>{
       author_id: a,
@@ -33,19 +35,11 @@ export class AuthorService implements OnModuleInit {
     }));
   }
 
+  @Span()
   public getAuthorList(): Observable<Author[]> {
     return this.getAuthors(
       getRandomArray('au', Math.floor(Math.random() * 15), 7)
     );
-  }
-
-  @ResolveField()
-  public async bookList(
-    @Parent() parent: Author,
-    /** Add Context */
-    @Context('bookDataLoader') bookLoader: DataLoader<string, Book>,
-  ) {
-    return bookLoader.loadMany(parent.book_ids);
   }
 
 }

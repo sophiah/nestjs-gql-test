@@ -1,8 +1,8 @@
+import { Span } from '@metinseylan/nestjs-opentelemetry';
 import { Inject } from '@nestjs/common';
-import { Args, Resolver, Query, Context, ResolveReference, CONTEXT, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Resolver, Query, CONTEXT, ResolveField, Parent } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
-import { lastValueFrom, take } from 'rxjs';
-import { Author, Book, IQuery } from 'src/gql/bookstoreDO';
+import { Author } from 'src/gql/bookstoreDO';
 import { AuthorService } from './author.service';
 
 @Resolver('Author')
@@ -12,6 +12,7 @@ export class AuthorResolver /* implements IQuery /* */ {
     @Inject(CONTEXT) private httpContext,
     ) {}
 
+  @Span()
   @Query('author')
   async author(
     @Args('author_id') id: string
@@ -23,20 +24,9 @@ export class AuthorResolver /* implements IQuery /* */ {
     }
   }
 
-  @Query('authors')
-  async authors(): Promise<Author[]> {
-    try {
-      return await lastValueFrom(
-        this.authorService.getAuthorList().pipe(take(1)),
-      );
-    } catch (err) {
-      throw new UserInputError(err.message);
-    }
-  }
-
   @ResolveField('books')
-  books(@Parent() author: Author) {
-    return this.httpContext['bookDataLoader'].load(author.book_ids);
+  async books(@Parent() author: Author) {
+    return this.httpContext['bookDataLoader'].loadMany(author.book_ids);
   }
 
 }

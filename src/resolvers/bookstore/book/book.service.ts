@@ -3,6 +3,7 @@ import * as DataLoader from 'dataloader';
 import { lastValueFrom, Observable, of, take } from 'rxjs';
 import { Book } from 'src/gql/bookstoreDO';
 import { getRandomArray, mapFromArray, newId } from 'src/utils';
+import { Span } from '@metinseylan/nestjs-opentelemetry';
 
 export function bookDataLoader(bookService: BookService) {
   return new DataLoader<string, Book>(async function (ids: string[]) {
@@ -24,6 +25,7 @@ export class BookService implements OnModuleInit {
     console.log('[Init] Book Service')
   }
 
+  @Span()
   public getBooks(ids: string[]): Observable<Book[]> {
     return of(ids.map( a => <Book>{
       book_id: a,
@@ -32,6 +34,7 @@ export class BookService implements OnModuleInit {
     }));
   }
 
+  @Span()
   public getBookList(): Observable<Book[]> {
     return this.getBooks(
       getRandomArray('bk', Math.floor(Math.random() * 15), 7)
