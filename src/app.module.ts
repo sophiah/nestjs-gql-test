@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { GraphQLFederationModule, GraphQLGatewayModule, GraphQLModule } from '@nestjs/graphql';
+import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { BookstoreModule } from './resolvers/bookstore/bookstore.module';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
