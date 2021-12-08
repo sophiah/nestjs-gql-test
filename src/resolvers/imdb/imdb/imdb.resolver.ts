@@ -12,7 +12,7 @@ export class ImdbResolver /* implements IQuery /* */ {
     @Inject(CONTEXT) private httpContext,
     ) {}
 
-  @ResolveProperty('__resolveType')
+  @ResolveField('__resolveType')
   __resolveType(obj) {
     if (obj instanceof TvSeries) {
       return 'TvSeries';
@@ -29,10 +29,10 @@ export class ImdbResolver /* implements IQuery /* */ {
       (await this.imdbService.queryTitle(mongoQuery)).forEach(
         x => {
           if (MongoTitleType.MOVIE.indexOf(x.titleType) != -1) {
-            rtn.push(<Movie>x)
+            rtn.push(Object.assign(new Movie(), x))
           }
           if (MongoTitleType.TVSHOW.indexOf(x.titleType) != -1) {
-            rtn.push(<TvSeries>x)
+            rtn.push(Object.assign(new TvSeries(), x))
           }
         }
       )

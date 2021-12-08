@@ -63,13 +63,25 @@ export class Movie implements Title {
     crews?: Nullable<Nullable<Crew>[]>;
 }
 
-export class Episode {
+export class TvEpisode implements Title {
     tconst: string;
-    parentTconst?: Nullable<string>;
-    seasonNumber?: Nullable<string>;
-    episodeNumber?: Nullable<string>;
+    titleType: string;
+    primaryTitle: string;
+    originalTitle?: Nullable<string>;
+    startYear?: Nullable<number>;
+    endYear?: Nullable<number>;
+    isAdult?: Nullable<number>;
+    runtimeMinutes?: Nullable<string>;
+    genres?: Nullable<Nullable<string>[]>;
     principles?: Nullable<Nullable<Principles>[]>;
     crews?: Nullable<Nullable<Crew>[]>;
+}
+
+export class Episode {
+    tconst: string;
+    seasonNumber?: Nullable<string>;
+    episodeNumber?: Nullable<string>;
+    episodeDetail?: Nullable<TvEpisode>;
 }
 
 export class TvSeries implements Title {

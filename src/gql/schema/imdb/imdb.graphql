@@ -44,14 +44,25 @@ type Movie implements Title {
     crews: [Crew]
 }
 
-type Episode {
+type TvEpisode implements Title {
     tconst: ID!
-    parentTconst: String
-    seasonNumber: String
-    episodeNumber: String
-
+    titleType: String!
+    primaryTitle: String!
+    originalTitle: String
+    startYear: Int
+    endYear: Int
+    isAdult: Int
+    runtimeMinutes: String
+    genres: [String]
     principles: [Principles]
     crews: [Crew]
+}
+
+type Episode {
+    tconst: ID!
+    seasonNumber: String
+    episodeNumber: String
+    episodeDetail: TvEpisode 
 }
 
 type TvSeries implements Title {

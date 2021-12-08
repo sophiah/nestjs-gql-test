@@ -2,9 +2,10 @@ import { OnModuleInit } from '@nestjs/common';
 import * as DataLoader from 'dataloader';
 import { Connection, Model, Schema } from 'mongoose';
 import { Episode, Movie, QueryTitle, Title, TitleType, TvSeries } from 'src/gql/imdbDO';
-import { TitleBasicDocument, TitleBasicSchema } from './schema/TitleBasic';
 import { Document } from 'mongoose';
 import mongoose = require('mongoose');
+import { TitleBasicDocument, TitleBasicSchema } from './schema/TitleBasic';
+import { TitleEpisodeDocument, TitleEpisodeSchema } from './schema/TitleEpisode';
 
 const IMDB_CONN_STR = process.env['IMDB_CONNSTR']
 const IMDB_DBNAME = 'imdb'
@@ -73,6 +74,14 @@ export class ImdbService implements OnModuleInit {
     return this.titleBasicModel;
   }
 
+  private titleEpisodeModel = null
+  private async getTitleEpisodeModel (): Promise<Model<TitleEpisodeDocument>> {
+    if (!this.titleEpisodeModel) {
+      this.titleEpisodeModel = await this.getModel<TitleEpisodeDocument>('title_episode', TitleEpisodeSchema);
+    }
+    return this.titleEpisodeModel;
+  }
+
   private async getModel<T extends Document> (name: string, schema: Schema<T>): Promise<Model<T>> {
     const conn: Connection = await this.mongoseConn;
     return conn.model(name, schema);
@@ -83,7 +92,13 @@ export class ImdbService implements OnModuleInit {
       [
         { $match: {titleType: {$in: query.titleTypes}}}, 
         { $sample: {size: query.count.valueOf()} }
-    ]));
+      ]));
+  }
+
+  public async queryEpisode(parentTitleIds: []): Promise<Episode[]> {
+    return (await this.getTitleEpisodeModel()).find(
+      { tconst: {$in: parentTitleIds} }
+    )
   }
 
 }
