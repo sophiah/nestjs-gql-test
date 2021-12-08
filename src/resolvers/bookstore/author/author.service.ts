@@ -38,14 +38,4 @@ export class AuthorService implements OnModuleInit {
       getRandomArray('au', Math.floor(Math.random() * 15), 7)
     );
   }
-
-  @ResolveField()
-  public async bookList(
-    @Parent() parent: Author,
-    /** Add Context */
-    @Context('bookDataLoader') bookLoader: DataLoader<string, Book>,
-  ) {
-    return bookLoader.loadMany(parent.book_ids);
-  }
-
 }

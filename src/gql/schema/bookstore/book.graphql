@@ -1,5 +1,6 @@
 type Book {
     book_id: ID!
+    type: String!
     name: String!
     author_ids: [ID!]
 }

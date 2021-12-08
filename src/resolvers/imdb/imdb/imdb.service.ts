@@ -1,0 +1,89 @@
+import { OnModuleInit } from '@nestjs/common';
+import * as DataLoader from 'dataloader';
+import { Connection, Model, Schema } from 'mongoose';
+import { Episode, Movie, QueryTitle, Title, TitleType, TvSeries } from 'src/gql/imdbDO';
+import { TitleBasicDocument, TitleBasicSchema } from './schema/TitleBasic';
+import { Document } from 'mongoose';
+import mongoose = require('mongoose');
+
+const IMDB_CONN_STR = process.env['IMDB_CONNSTR']
+const IMDB_DBNAME = 'imdb'
+const COLLECTION_TITLE_BASIC = 'title_basic'
+
+export class MongoTitleType {
+  static TVSHOW = ["tvMiniSeries","tvSeries"]
+  static MOVIE = ["movie", "tvMovie"]
+  static EPISODE = ["tvEpisode"]
+}
+
+export class MongoQuery {
+  titleTypes: string[] = []
+  count: Number
+ 
+  compose(titleTypes: string[], count: Number) {
+    this.titleTypes = titleTypes;
+    this.count = count;
+  }
+  
+  composeFromQueryType(input: QueryTitle) {
+    this.count = input.count;
+    this.composeTitleType(input.titleType)
+  }
+
+  composeTitleType(input_types: TitleType[]) {
+    if (input_types.find( x => x == TitleType.TVSHOW)) {
+      this.titleTypes = this.titleTypes.concat(MongoTitleType.TVSHOW)
+    }
+    if (input_types.find( x => x == TitleType.MOVIE)) {
+      this.titleTypes = this.titleTypes.concat(MongoTitleType.MOVIE)
+    }
+  }
+}
+
+
+// export function imdbEpisodeDataLoader(imdbSrv: ImdbService) {
+//   return new DataLoader<string, Episode>(async function (ids: string[]) {
+
+//     const titleList: Title[] = await lastValueFrom(
+//       imdbSrv.queryTitle(ids).pipe(take(1)),
+//     );
+
+//     const _idMap = mapFromArray(
+//       authorList.map((x) => <Author>x),
+//       (x) => x.author_id,
+//     );
+//     return ids.map((id) => _idMap[id]);
+//   });
+// }
+
+export class ImdbService implements OnModuleInit {
+  onModuleInit() {
+    console.log('[Init] IMDB Service')
+  }
+
+  constructor(
+    private readonly mongoseConn: Connection = mongoose.createConnection(IMDB_CONN_STR)
+  ) {}
+
+  private titleBasicModel = null
+  private async getTitleBasicModel (): Promise<Model<TitleBasicDocument>> {
+    if (!this.titleBasicModel) {
+      this.titleBasicModel = await this.getModel<TitleBasicDocument>('title_basic', TitleBasicSchema);
+    }
+    return this.titleBasicModel;
+  }
+
+  private async getModel<T extends Document> (name: string, schema: Schema<T>): Promise<Model<T>> {
+    const conn: Connection = await this.mongoseConn;
+    return conn.model(name, schema);
+  }
+
+  public async queryTitle(query: MongoQuery): Promise<Title[]> {
+    return this.getTitleBasicModel().then(model => model.aggregate(
+      [
+        { $match: {titleType: {$in: query.titleTypes}}}, 
+        { $sample: {size: query.count.valueOf()} }
+    ]));
+  }
+
+}

@@ -1,0 +1,85 @@
+type Principles {
+    tconst: String!
+    nconst: String!
+    ordering: Int
+    category: String
+    job: String
+    characters: [String]
+}
+
+type Crew {
+    nconst: ID!
+    primaryName: String!
+    birthYear: Int
+    deathYear: Int
+    primaryProfession: [String]
+    knownForTitles: [String]
+}
+
+interface Title {
+    tconst: ID!
+    titleType: String!
+    primaryTitle: String!
+    originalTitle: String
+    startYear: Int
+    endYear: Int
+    isAdult: Int
+    runtimeMinutes: String
+    genres: [String]
+    principles: [Principles]
+    crews: [Crew]
+}
+
+type Movie implements Title {
+    tconst: ID!
+    titleType: String!
+    primaryTitle: String!
+    originalTitle: String
+    startYear: Int
+    endYear: Int
+    isAdult: Int
+    runtimeMinutes: String
+    genres: [String]
+    principles: [Principles]
+    crews: [Crew]
+}
+
+type Episode {
+    tconst: ID!
+    parentTconst: String
+    seasonNumber: String
+    episodeNumber: String
+
+    principles: [Principles]
+    crews: [Crew]
+}
+
+type TvSeries implements Title {
+    tconst: ID!
+    titleType: String!
+    primaryTitle: String!
+    originalTitle: String
+    startYear: Int
+    endYear: Int
+    isAdult: Int
+    runtimeMinutes: String
+    genres: [String]
+    principles: [Principles]
+    crews: [Crew]
+
+    episodes: [Episode]
+}
+
+enum TitleType {
+  TVSHOW
+  MOVIE
+}
+
+input QueryTitle {
+    titleType: [TitleType!]!
+    count: Int!
+}
+
+type Query {
+    queryTitle(query: QueryTitle!): [Title]
+}

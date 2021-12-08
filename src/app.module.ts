@@ -5,11 +5,12 @@ import { BookstoreModule } from './resolvers/bookstore/bookstore.module';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.service';
 import { authorDataLoader, AuthorService } from './resolvers/bookstore/author/author.service';
+import { ImdbModule } from './resolvers/imdb/imdb.module';
 @Module({
   imports: [
     // register graphql module
     GraphQLModule.forRootAsync({
-      imports: [BookstoreModule],
+      imports: [BookstoreModule, ImdbModule],
       useFactory: (bookService: BookService, authorService: AuthorService) => ({
         // for data loader
         typePaths: [join(__dirname, '../gql/schema/**/*.graphql')], // schema
