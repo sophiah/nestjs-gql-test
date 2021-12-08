@@ -59,7 +59,8 @@ type TvEpisode implements Title {
 }
 
 type Episode {
-    tconst: ID!
+    tconst: ID
+    parentTconst: ID
     seasonNumber: String
     episodeNumber: String
     episodeDetail: TvEpisode 

@@ -6,12 +6,17 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.service';
 import { authorDataLoader, AuthorService } from './resolvers/bookstore/author/author.service';
 import { ImdbModule } from './resolvers/imdb/imdb.module';
+import { imdbEpisodeDataLoader, ImdbService, imdbTitleDataLoader } from './resolvers/imdb/imdb/imdb.service';
 @Module({
   imports: [
     // register graphql module
     GraphQLModule.forRootAsync({
       imports: [BookstoreModule, ImdbModule],
-      useFactory: (bookService: BookService, authorService: AuthorService) => ({
+      useFactory: (
+        bookService: BookService, 
+        authorService: AuthorService,
+        imdbService: ImdbService,
+      ) => ({
         // for data loader
         typePaths: [join(__dirname, '../gql/schema/**/*.graphql')], // schema
         playground: false, // iGraphQL UI, it will be deprecated
@@ -22,10 +27,12 @@ import { ImdbModule } from './resolvers/imdb/imdb.module';
         context: () => ({
           bookDataLoader: bookDataLoader(bookService),
           authorDataLoader: authorDataLoader(authorService),
+          imdbEpisodeDataLoader: imdbEpisodeDataLoader(imdbService),
+          imdbTitleDataLoader: imdbTitleDataLoader(imdbService),
         }),
       }),
       // for data loader
-      inject: [BookService, AuthorService],
+      inject: [BookService, AuthorService, ImdbService],
     }),
   ],
   controllers: [],

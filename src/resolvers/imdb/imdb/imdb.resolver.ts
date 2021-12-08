@@ -1,8 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { Args, Resolver, Query, Context, ResolveReference, CONTEXT, ResolveField, Parent, ResolveProperty } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
-import { lastValueFrom, take } from 'rxjs';
-import { Movie, QueryTitle, Title, TvSeries } from 'src/gql/imdbDO';
+import { Episode, Movie, QueryTitle, Title, TvSeries } from 'src/gql/imdbDO';
 import { ImdbService, MongoQuery, MongoTitleType } from './imdb.service';
 
 @Resolver('Title')
@@ -42,5 +41,27 @@ export class ImdbResolver /* implements IQuery /* */ {
     }
   }
 
+}
+@Resolver('TvSeries')
+export class TvSeriesResolver {
+  constructor(
+    @Inject(CONTEXT) private httpContext,
+    ) {}
 
+  @ResolveField('episodes')
+  async episodes(@Parent() tvSeries: TvSeries) {
+    return this.httpContext['imdbEpisodeDataLoader'].load(tvSeries.tconst);
+  }
+}
+
+@Resolver('Episode')
+export class EpisodeResolver {
+  constructor(
+    @Inject(CONTEXT) private httpContext,
+    ) {}
+
+  @ResolveField('episodeDetail')
+  async episodeDetail(@Parent() parent: Episode) {
+    return this.httpContext['imdbTitleDataLoader'].load(parent.tconst);
+  }
 }

@@ -6,6 +6,7 @@ import { Document } from 'mongoose';
 import mongoose = require('mongoose');
 import { TitleBasicDocument, TitleBasicSchema } from './schema/TitleBasic';
 import { TitleEpisodeDocument, TitleEpisodeSchema } from './schema/TitleEpisode';
+import { mapFromArray } from 'src/utils';
 
 const IMDB_CONN_STR = process.env['IMDB_CONNSTR']
 const IMDB_DBNAME = 'imdb'
@@ -41,21 +42,29 @@ export class MongoQuery {
   }
 }
 
+export function imdbTitleDataLoader(imdbSrv: ImdbService) {
+  return new DataLoader<string, Title[]>(async function (tconsts: string[]) {
 
-// export function imdbEpisodeDataLoader(imdbSrv: ImdbService) {
-//   return new DataLoader<string, Episode>(async function (ids: string[]) {
+    const titleList: Episode[] = await (imdbSrv.queryByTitleIds(tconsts))
+    const _idMap = {}
+    titleList.forEach( o => {_idMap[o.tconst] = o })
+    return tconsts.map((id) => _idMap[id]);
+  });
+}
 
-//     const titleList: Title[] = await lastValueFrom(
-//       imdbSrv.queryTitle(ids).pipe(take(1)),
-//     );
+export function imdbEpisodeDataLoader(imdbSrv: ImdbService) {
+  return new DataLoader<string, Episode[]>(async function (parentTconsts: string[]) {
 
-//     const _idMap = mapFromArray(
-//       authorList.map((x) => <Author>x),
-//       (x) => x.author_id,
-//     );
-//     return ids.map((id) => _idMap[id]);
-//   });
-// }
+    const episodeList: Episode[] = await (imdbSrv.queryEpisode(parentTconsts))
+    const _idMap = {}
+    episodeList.forEach( o => {
+      (_idMap[o.parentTconst])
+        ? _idMap[o.parentTconst].push(o)
+        : _idMap[o.parentTconst] = [o]
+    })
+    return parentTconsts.map((id) => _idMap[id]);
+  });
+}
 
 export class ImdbService implements OnModuleInit {
   onModuleInit() {
@@ -95,9 +104,15 @@ export class ImdbService implements OnModuleInit {
       ]));
   }
 
-  public async queryEpisode(parentTitleIds: []): Promise<Episode[]> {
+  public async queryEpisode(parentTitleIds: string[]): Promise<Episode[]> {
     return (await this.getTitleEpisodeModel()).find(
-      { tconst: {$in: parentTitleIds} }
+      { parentTconst: {$in: parentTitleIds} }
+    )
+  }
+
+  public async queryByTitleIds(titleIds: string[]): Promise<Title[]> {
+    return (await this.getTitleBasicModel()).find(
+      { tconst: {$in: titleIds} }
     )
   }
 

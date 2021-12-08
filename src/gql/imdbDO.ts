@@ -78,7 +78,8 @@ export class TvEpisode implements Title {
 }
 
 export class Episode {
-    tconst: string;
+    tconst?: Nullable<string>;
+    parentTconst?: Nullable<string>;
     seasonNumber?: Nullable<string>;
     episodeNumber?: Nullable<string>;
     episodeDetail?: Nullable<TvEpisode>;

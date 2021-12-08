@@ -12,15 +12,15 @@ export default class TitleBasic {
   @Prop()
   public originalTitle: string;
   @Prop()
-  public isAdult: Number;
+  public isAdult: number;
   @Prop()
-  public startYear: Number;
+  public startYear: number;
   @Prop()
-  public endYear: Number;
+  public endYear: number;
   @Prop()
-  public runtimeMinutes: String;
+  public runtimeMinutes: string;
   @Prop()
-  public genres: String[];
+  public genres: string[];
 }
 
 export type TitleBasicDocument = TitleBasic & Document;
