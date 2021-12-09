@@ -7,8 +7,10 @@ import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.ser
 import { authorDataLoader, AuthorService } from './resolvers/bookstore/author/author.service';
 import { ImdbModule } from './resolvers/imdb/imdb.module';
 import { imdbEpisodeDataLoader, ImdbService, imdbTitleDataLoader } from './resolvers/imdb/imdb/imdb.service';
+import { PageModule } from './pages/page.module';
 @Module({
   imports: [
+    PageModule,
     // register graphql module
     GraphQLModule.forRootAsync({
       imports: [BookstoreModule, ImdbModule],

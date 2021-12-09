@@ -27,8 +27,7 @@ export interface Title {
     isAdult?: Nullable<number>;
     runtimeMinutes?: Nullable<string>;
     genres?: Nullable<Nullable<string>[]>;
-    principles?: Nullable<Nullable<Principles>[]>;
-    crews?: Nullable<Nullable<Crew>[]>;
+    crews?: Nullable<Nullable<TitleCrew>[]>;
 }
 
 export class Principles {
@@ -46,7 +45,14 @@ export class Crew {
     birthYear?: Nullable<number>;
     deathYear?: Nullable<number>;
     primaryProfession?: Nullable<Nullable<string>[]>;
-    knownForTitles?: Nullable<Nullable<string>[]>;
+}
+
+export class TitleCrew {
+    tconst: string;
+    directors?: Nullable<string[]>;
+    writers?: Nullable<string[]>;
+    directorsDetail?: Nullable<Crew[]>;
+    writersDetail?: Nullable<Crew[]>;
 }
 
 export class Movie implements Title {
@@ -59,8 +65,7 @@ export class Movie implements Title {
     isAdult?: Nullable<number>;
     runtimeMinutes?: Nullable<string>;
     genres?: Nullable<Nullable<string>[]>;
-    principles?: Nullable<Nullable<Principles>[]>;
-    crews?: Nullable<Nullable<Crew>[]>;
+    crews?: Nullable<Nullable<TitleCrew>[]>;
 }
 
 export class TvEpisode implements Title {
@@ -73,8 +78,7 @@ export class TvEpisode implements Title {
     isAdult?: Nullable<number>;
     runtimeMinutes?: Nullable<string>;
     genres?: Nullable<Nullable<string>[]>;
-    principles?: Nullable<Nullable<Principles>[]>;
-    crews?: Nullable<Nullable<Crew>[]>;
+    crews?: Nullable<Nullable<TitleCrew>[]>;
 }
 
 export class Episode {
@@ -95,13 +99,14 @@ export class TvSeries implements Title {
     isAdult?: Nullable<number>;
     runtimeMinutes?: Nullable<string>;
     genres?: Nullable<Nullable<string>[]>;
-    principles?: Nullable<Nullable<Principles>[]>;
-    crews?: Nullable<Nullable<Crew>[]>;
+    crews?: Nullable<Nullable<TitleCrew>[]>;
     episodes?: Nullable<Nullable<Episode>[]>;
 }
 
 export abstract class IQuery {
     abstract queryTitle(query: QueryTitle): Nullable<Nullable<Title>[]> | Promise<Nullable<Nullable<Title>[]>>;
+
+    abstract queryCrew(count: number): Nullable<Nullable<Crew>[]> | Promise<Nullable<Nullable<Crew>[]>>;
 }
 
 type Nullable<T> = T | null;

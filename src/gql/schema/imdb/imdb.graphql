@@ -13,7 +13,14 @@ type Crew {
     birthYear: Int
     deathYear: Int
     primaryProfession: [String]
-    knownForTitles: [String]
+}
+
+type TitleCrew {
+    tconst: ID!
+    directors: [String!]
+    writers: [String!]
+    directorsDetail: [Crew!]
+    writersDetail: [Crew!]
 }
 
 interface Title {
@@ -26,8 +33,8 @@ interface Title {
     isAdult: Int
     runtimeMinutes: String
     genres: [String]
-    principles: [Principles]
-    crews: [Crew]
+    # principles: [Principles]
+    crews: [TitleCrew]
 }
 
 type Movie implements Title {
@@ -40,8 +47,8 @@ type Movie implements Title {
     isAdult: Int
     runtimeMinutes: String
     genres: [String]
-    principles: [Principles]
-    crews: [Crew]
+    # principles: [Principles]
+    crews: [TitleCrew]
 }
 
 type TvEpisode implements Title {
@@ -54,8 +61,8 @@ type TvEpisode implements Title {
     isAdult: Int
     runtimeMinutes: String
     genres: [String]
-    principles: [Principles]
-    crews: [Crew]
+    # principles: [Principles]
+    crews: [TitleCrew]
 }
 
 type Episode {
@@ -76,8 +83,8 @@ type TvSeries implements Title {
     isAdult: Int
     runtimeMinutes: String
     genres: [String]
-    principles: [Principles]
-    crews: [Crew]
+    # principles: [Principles]
+    crews: [TitleCrew]
 
     episodes: [Episode]
 }
@@ -94,4 +101,5 @@ input QueryTitle {
 
 type Query {
     queryTitle(query: QueryTitle!): [Title]
+    queryCrew(count: Int!): [Crew]
 }

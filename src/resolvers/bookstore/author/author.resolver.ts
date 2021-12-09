@@ -1,8 +1,7 @@
 import { Inject } from '@nestjs/common';
-import { Args, Resolver, Query, Context, ResolveReference, CONTEXT, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Resolver, Query, CONTEXT, ResolveField, Parent } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
-import { lastValueFrom, take } from 'rxjs';
-import { Author, Book, IQuery } from 'src/gql/bookstoreDO';
+import { Author } from 'src/gql/bookstoreDO';
 import { AuthorService } from './author.service';
 
 @Resolver('Author')

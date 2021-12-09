@@ -1,8 +1,7 @@
 import { OnModuleInit } from '@nestjs/common';
-import { Context, Parent, ResolveField } from '@nestjs/graphql';
 import * as DataLoader from 'dataloader';
 import { lastValueFrom, Observable, of, take } from 'rxjs';
-import { Author, Book } from 'src/gql/bookstoreDO';
+import { Author } from 'src/gql/bookstoreDO';
 import { getRandomArray, mapFromArray, newId } from 'src/utils';
 
 
