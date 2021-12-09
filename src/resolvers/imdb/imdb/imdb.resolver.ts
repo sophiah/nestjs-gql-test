@@ -1,8 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { Args, Resolver, Query, Context, ResolveReference, CONTEXT, ResolveField, Parent, ResolveProperty } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
+import DataLoader from 'dataloader';
 import { Episode, Movie, QueryTitle, Title, TvSeries } from 'src/gql/imdbDO';
-import { ImdbService, MongoQuery, MongoTitleType } from './imdb.service';
+import { Loader } from 'src/intercept/data_loader';
+import { ImdbEpisodeLoader, ImdbService, ImdbTitleLoader, MongoQuery, MongoTitleType } from './imdb.service';
 
 @Resolver('Title')
 export class ImdbResolver /* implements IQuery /* */ {
@@ -44,24 +46,26 @@ export class ImdbResolver /* implements IQuery /* */ {
 }
 @Resolver('TvSeries')
 export class TvSeriesResolver {
-  constructor(
-    @Inject(CONTEXT) private httpContext,
-    ) {}
+  constructor() {}
 
   @ResolveField('episodes')
-  async episodes(@Parent() tvSeries: TvSeries) {
-    return this.httpContext['imdbEpisodeDataLoader'].load(tvSeries.tconst);
+  async episodes(
+    @Parent() tvSeries: TvSeries,
+    @Loader(ImdbEpisodeLoader) dataLoader: DataLoader<Episode['tconst'], Episode[]>
+  ) {
+    return dataLoader.load(tvSeries.tconst);
   }
 }
 
 @Resolver('Episode')
 export class EpisodeResolver {
-  constructor(
-    @Inject(CONTEXT) private httpContext,
-    ) {}
+  constructor() {}
 
   @ResolveField('episodeDetail')
-  async episodeDetail(@Parent() parent: Episode) {
-    return this.httpContext['imdbTitleDataLoader'].load(parent.tconst);
+  async episodeDetail(
+    @Parent() parent: Episode,
+    @Loader(ImdbTitleLoader) dataLoader: DataLoader<Title['tconst'], Title>
+  ) {
+    return dataLoader.load(parent.tconst);
   }
 }

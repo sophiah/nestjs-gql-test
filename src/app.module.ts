@@ -3,22 +3,18 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 import { BookstoreModule } from './resolvers/bookstore/bookstore.module';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.service';
-import { authorDataLoader, AuthorService } from './resolvers/bookstore/author/author.service';
+// import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.service';
 import { ImdbModule } from './resolvers/imdb/imdb.module';
-import { imdbEpisodeDataLoader, ImdbService, imdbTitleDataLoader } from './resolvers/imdb/imdb/imdb.service';
 import { PageModule } from './pages/page.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { DataLoaderInterceptor } from './intercept/data_loader';
 @Module({
   imports: [
     PageModule,
     // register graphql module
     GraphQLModule.forRootAsync({
       imports: [BookstoreModule, ImdbModule],
-      useFactory: (
-        bookService: BookService, 
-        authorService: AuthorService,
-        imdbService: ImdbService,
-      ) => ({
+      useFactory: () => ({
         // for data loader
         typePaths: [join(__dirname, '../gql/schema/**/*.graphql')], // schema
         playground: false, // iGraphQL UI, it will be deprecated
@@ -27,17 +23,17 @@ import { PageModule } from './pages/page.module';
           ApolloServerPluginLandingPageGraphQLPlayground(),
         ],
         context: () => ({
-          bookDataLoader: bookDataLoader(bookService),
-          authorDataLoader: authorDataLoader(authorService),
-          imdbEpisodeDataLoader: imdbEpisodeDataLoader(imdbService),
-          imdbTitleDataLoader: imdbTitleDataLoader(imdbService),
+          // additional context
         }),
       }),
-      // for data loader
-      inject: [BookService, AuthorService, ImdbService],
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DataLoaderInterceptor,
+    }
+  ],
 })
 export class AppModule {}

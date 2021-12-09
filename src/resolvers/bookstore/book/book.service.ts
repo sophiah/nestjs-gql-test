@@ -1,30 +1,13 @@
-import { OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
 import * as DataLoader from 'dataloader';
-import { lastValueFrom, Observable, of, take } from 'rxjs';
+import { lastValueFrom, Observable, of, take} from 'rxjs';
 import { Book } from 'src/gql/bookstoreDO';
+import { NestDataLoader } from 'src/intercept/data_loader';
 import { getRandomArray, mapFromArray, newId } from 'src/utils';
 
-export function bookDataLoader(bookService: BookService) {
-  return new DataLoader<string, Book>(async function (ids: string[]) {
+export class BookService {
 
-    const bookList: Book[] = await lastValueFrom(
-      bookService.getBooks(ids).pipe(take(1)),
-    );
-
-    const _idMap = mapFromArray(
-      bookList.map((x) => <Book>x),
-      (x) => x.book_id,
-    );
-    return ids.map((id) => _idMap[id]);
-  });
-}
-
-export class BookService implements OnModuleInit {
-  onModuleInit() {
-    console.log('[Init] Book Service')
-  }
-
-  public getBooks(ids: string[]): Observable<Book[]> {
+  public getBooks(ids: readonly string[]): Observable<Book[]> {
     return of(ids.map( a => <Book>{
       book_id: a,
       name: 'Book Name - ' + newId(5),
@@ -38,4 +21,27 @@ export class BookService implements OnModuleInit {
     );
   }
 
+}
+
+@Injectable({ scope: Scope.REQUEST})
+export class BookLoader implements NestDataLoader<string, Book> {
+  constructor(private readonly bookService: BookService) {
+    console.log('bookLoader')
+  }
+
+  generateDataLoader(): DataLoader<string, Book, string> {
+    console.log('generate data loader')
+    console.log(this.bookService.getBooks)
+    return new DataLoader<string, Book>(async ids => {
+      const bookList: Book[] = await lastValueFrom(
+        this.bookService.getBooks(ids).pipe(take(1)),
+      );
+  
+      const _idMap = mapFromArray(
+        bookList.map((x) => <Book>x),
+        (x) => x.book_id,
+      );
+      return ids.map((id) => _idMap[id]);
+    });
+  }
 }

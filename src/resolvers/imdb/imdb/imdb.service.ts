@@ -1,4 +1,4 @@
-import { OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
 import * as DataLoader from 'dataloader';
 import { Connection, Model, Schema } from 'mongoose';
 import { Episode, Movie, QueryTitle, Title, TitleType, TvSeries } from 'src/gql/imdbDO';
@@ -7,6 +7,8 @@ import mongoose = require('mongoose');
 import { TitleBasicDocument, TitleBasicSchema } from './schema/TitleBasic';
 import { TitleEpisodeDocument, TitleEpisodeSchema } from './schema/TitleEpisode';
 import { mapFromArray } from 'src/utils';
+import { NestDataLoader } from 'src/intercept/data_loader';
+import { lastValueFrom } from 'rxjs';
 
 const IMDB_CONN_STR = process.env['IMDB_CONNSTR']
 const IMDB_DBNAME = 'imdb'
@@ -40,30 +42,6 @@ export class MongoQuery {
       this.titleTypes = this.titleTypes.concat(MongoTitleType.MOVIE)
     }
   }
-}
-
-export function imdbTitleDataLoader(imdbSrv: ImdbService) {
-  return new DataLoader<string, Title[]>(async function (tconsts: string[]) {
-
-    const titleList: Episode[] = await (imdbSrv.queryByTitleIds(tconsts))
-    const _idMap = {}
-    titleList.forEach( o => {_idMap[o.tconst] = o })
-    return tconsts.map((id) => _idMap[id]);
-  });
-}
-
-export function imdbEpisodeDataLoader(imdbSrv: ImdbService) {
-  return new DataLoader<string, Episode[]>(async function (parentTconsts: string[]) {
-
-    const episodeList: Episode[] = await (imdbSrv.queryEpisode(parentTconsts))
-    const _idMap = {}
-    episodeList.forEach( o => {
-      (_idMap[o.parentTconst])
-        ? _idMap[o.parentTconst].push(o)
-        : _idMap[o.parentTconst] = [o]
-    })
-    return parentTconsts.map((id) => _idMap[id]);
-  });
 }
 
 export class ImdbService implements OnModuleInit {
@@ -104,16 +82,53 @@ export class ImdbService implements OnModuleInit {
       ]));
   }
 
-  public async queryEpisode(parentTitleIds: string[]): Promise<Episode[]> {
+  public async queryEpisode(parentTitleIds: readonly string[]): Promise<Episode[]> {
+    // parentTitleIds.forEach( x => input.push(x))
     return (await this.getTitleEpisodeModel()).find(
-      { parentTconst: {$in: parentTitleIds} }
+      { parentTconst: {$in: parentTitleIds.slice(0, parentTitleIds.length)} }
     )
   }
 
-  public async queryByTitleIds(titleIds: string[]): Promise<Title[]> {
+  public async queryByTitleIds(titleIds: readonly string[]): Promise<Title[]> {
     return (await this.getTitleBasicModel()).find(
-      { tconst: {$in: titleIds} }
+      { tconst: {$in: titleIds.slice(0, titleIds.length)} }
     )
   }
 
 }
+
+@Injectable({ scope: Scope.REQUEST})
+export class ImdbEpisodeLoader implements NestDataLoader<string, Episode[]> {
+  constructor(private readonly imdbSrv: ImdbService) {
+  }
+
+  generateDataLoader(): DataLoader<string, Episode[], string> {
+    return new DataLoader<string, Episode[]>(async parentTconsts => {
+      const episodeList: Episode[] = await (this.imdbSrv.queryEpisode(parentTconsts))
+      const _idMap = {}
+      episodeList.forEach( o => {
+        (_idMap[o.parentTconst])
+          ? _idMap[o.parentTconst].push(o)
+          : _idMap[o.parentTconst] = [o]
+      })
+      return parentTconsts.map((id) => _idMap[id]);
+    });
+  }
+}
+
+@Injectable({scope: Scope.REQUEST})
+export class ImdbTitleLoader implements NestDataLoader<string, Title> {
+  constructor(private readonly imdbSrv: ImdbService) {
+  }
+
+  generateDataLoader(): DataLoader<string, Title, string> {
+    return new DataLoader<string, Title>(async tconsts => {
+
+      const titleList: Episode[] = await (this.imdbSrv.queryByTitleIds(tconsts))
+      const _idMap = {}
+      titleList.forEach( o => {_idMap[o.tconst] = o })
+      return tconsts.map((id) => _idMap[id]);
+    });
+  }
+}
+
