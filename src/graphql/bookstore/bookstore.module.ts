@@ -4,11 +4,13 @@ import { AuthorLoader, AuthorService } from './author/author.service';
 import { BookResolver } from './book/book.resolver';
 import { BookLoader, BookService } from './book/book.service';
 
+
+export const BookstoreResolvers: any[] = [AuthorResolver, BookResolver]
+export const BookstoreDataLoaders: any[] = [BookLoader, AuthorLoader]
+export const BookstoreServices: any[] = [BookService, AuthorService]
+
 @Module({
-  providers: [
-    BookService, BookResolver, BookLoader,
-    AuthorService, AuthorResolver, AuthorLoader,
-  ],
-  exports: [BookService, AuthorService],
+  providers: BookstoreServices.concat(BookstoreResolvers).concat(BookstoreDataLoaders),
+  exports: BookstoreServices,
 })
 export class BookstoreModule {}

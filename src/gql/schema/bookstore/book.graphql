@@ -5,7 +5,7 @@ type Book {
     author_ids: [ID!]
 }
 
-type Query {
+extend type Query {
     books: [Book!]
     book(book_id: ID!): Book
 }

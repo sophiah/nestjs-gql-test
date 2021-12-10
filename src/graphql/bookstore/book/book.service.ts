@@ -26,12 +26,9 @@ export class BookService {
 @Injectable({ scope: Scope.REQUEST})
 export class BookLoader implements NestDataLoader<string, Book> {
   constructor(private readonly bookService: BookService) {
-    console.log('bookLoader')
   }
 
   generateDataLoader(): DataLoader<string, Book, string> {
-    console.log('generate data loader')
-    console.log(this.bookService.getBooks)
     return new DataLoader<string, Book>(async ids => {
       const bookList: Book[] = await lastValueFrom(
         this.bookService.getBooks(ids).pipe(take(1)),

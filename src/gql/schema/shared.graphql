@@ -3,3 +3,7 @@ enum MutationType {
     UPDATED
     DELETED
 }
+
+type Query {
+    status: Int
+}

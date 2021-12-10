@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { Args, Resolver, Query, CONTEXT, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Resolver, Query, ResolveField, Parent } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
 import DataLoader from 'dataloader';
 import { Author, Book } from 'src/gql/bookstoreDO';
@@ -8,7 +8,7 @@ import { BookLoader } from '../book/book.service';
 import { AuthorLoader, AuthorService } from './author.service';
 
 @Resolver('Author')
-export class AuthorResolver /* implements IQuery /* */ {
+export class AuthorResolver  {
   constructor(
     private readonly authorService: AuthorService,
     ) {}

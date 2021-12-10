@@ -99,7 +99,7 @@ input QueryTitle {
     count: Int!
 }
 
-type Query {
+extend type Query {
     queryTitle(query: QueryTitle!): [Title]
     queryCrew(count: Int!): [Crew]
 }
