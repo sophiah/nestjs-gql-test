@@ -1,10 +1,11 @@
 type Book {
     book_id: ID!
+    type: String!
     name: String!
     author_ids: [ID!]
 }
 
-type Query {
+extend type Query {
     books: [Book!]
     book(book_id: ID!): Book
 }

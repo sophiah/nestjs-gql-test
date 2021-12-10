@@ -1,0 +1,9 @@
+enum MutationType {
+    CREATED
+    UPDATED
+    DELETED
+}
+
+type Query {
+    status: Int
+}

@@ -8,3 +8,10 @@ definitionsFactory.generate({
   outputAs: 'class',
   federation: true,
 });
+
+definitionsFactory.generate({
+  typePaths: ['./src/gql/schema/imdb/*.graphql'],
+  path: './src/gql/imdbDO.ts',
+  outputAs: 'class',
+  federation: true,
+});

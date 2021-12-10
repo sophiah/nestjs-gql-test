@@ -32,6 +32,7 @@ export abstract class IQuery {
 
 export class Book {
     book_id: string;
+    type: string;
     name: string;
     author_ids?: Nullable<string[]>;
     authors: Author[];

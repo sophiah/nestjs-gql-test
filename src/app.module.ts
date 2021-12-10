@@ -1,22 +1,25 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
-import { BookstoreModule } from './resolvers/bookstore/bookstore.module';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { bookDataLoader, BookService } from './resolvers/bookstore/book/book.service';
-import { authorDataLoader, AuthorService } from './resolvers/bookstore/author/author.service';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { DataLoaderInterceptor } from './intercept/data_loader';  
+import { BookstoreModule } from './graphql/bookstore/bookstore.module';
+import { ImdbModule } from './graphql/imdb/imdb.module';
+import { PageModule } from './pages/page.module';
 import { OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+
 @Module({
   imports: [
+    PageModule,
     OpenTelemetryModule.forRoot({
       spanProcessor: new SimpleSpanProcessor(new ConsoleSpanExporter())
     }),
     // register graphql module
     GraphQLModule.forRootAsync({
-      imports: [BookstoreModule],
-      useFactory: (bookService: BookService, authorService: AuthorService) => ({
-        // for data loader
+      imports: [BookstoreModule, ImdbModule],
+      useFactory: () => ({
         typePaths: [join(__dirname, '../gql/schema/**/*.graphql')], // schema
         playground: false, // iGraphQL UI, it will be deprecated
         debug: true,
@@ -24,15 +27,17 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-tra
           ApolloServerPluginLandingPageGraphQLPlayground(),
         ],
         context: () => ({
-          bookDataLoader: bookDataLoader(bookService),
-          authorDataLoader: authorDataLoader(authorService),
+          // additional context
         }),
       }),
-      // for data loader
-      inject: [BookService, AuthorService],
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DataLoaderInterceptor,
+    }
+  ],
 })
 export class AppModule {}
