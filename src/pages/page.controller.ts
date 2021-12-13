@@ -9,8 +9,10 @@ import { BookResolver } from 'src/graphql/bookstore/book/book.resolver';
 import { AuthorService } from 'src/graphql/bookstore/author/author.service';
 import { BookService } from 'src/graphql/bookstore/book/book.service';
 import { request, gql, GraphQLClient } from 'graphql-request'
+import { Counter } from '@metinseylan/nestjs-opentelemetry';
 
-const testQuery = `query bookstore ($book_id: ID!, $author_id: ID!) {
+const testQuery = `
+query bookstore ($book_id: ID!, $author_id: ID!) {
   book(book_id: $book_id) {
     book_id, name, author_ids
     authors { author_id, name }
@@ -19,11 +21,46 @@ const testQuery = `query bookstore ($book_id: ID!, $author_id: ID!) {
     author_id, name, book_ids
 		books {book_id, name}
   }
-}`
+}
+`
+
+const IMDB_QUERY = `
+query imdb {
+  queryTitle(query: {
+    count: 10,
+    titleType: [TVSHOW, MOVIE]
+  }) {
+    ...titleInfo
+  }
+}
+`
+
+const FRAGEMENTS = `fragment titleInfo on Title {
+	tconst
+  titleType
+  primaryTitle
+  originalTitle
+  ... on TvSeries {
+    episodes {
+      ...episodeInfo
+    }
+  }
+}
+
+fragment episodeInfo on Episode {
+	tconst
+  seasonNumber
+  episodeNumber
+  episodeDetail {
+      primaryTitle, originalTitle
+  }
+}
+
+`
 
 const client = new GraphQLClient("http://localhost:8080/graphql", {
   keepalive: true,
-  timeout: 600,
+  timeout: 30000,
 })
 
 @Controller('/page')
@@ -74,5 +111,19 @@ export class PageController {
     //   variables: {"author_id": "12345", "book_id": "56789"}
     // })
   }
+
+  @Get("/gql-imdb")
+  async getImdb(): Promise<Object> {
+    return client.request(
+      IMDB_QUERY + FRAGEMENTS, 
+      // {"author_id": "12345", "book_id": "56789"},
+      /** header here */
+    )
+    // .query({
+    //   query: gql(testQuery),
+    //   variables: {"author_id": "12345", "book_id": "56789"}
+    // })
+  }
+  //
 
 }

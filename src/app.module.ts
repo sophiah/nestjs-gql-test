@@ -7,14 +7,18 @@ import { DataLoaderInterceptor } from './intercept/data_loader';
 import { BookstoreModule } from './graphql/bookstore/bookstore.module';
 import { ImdbModule } from './graphql/imdb/imdb.module';
 import { PageModule } from './pages/page.module';
-import { OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
+import { ActiveHandlesMetric, HttpRequestDurationSeconds, OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { ConsoleMetricExporter } from '@opentelemetry/sdk-metrics-base';
+
 
 @Module({
   imports: [
     PageModule,
     OpenTelemetryModule.forRoot({
-      spanProcessor: new SimpleSpanProcessor(new ConsoleSpanExporter())
+      spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
     }),
     // register graphql module
     GraphQLModule.forRootAsync({
