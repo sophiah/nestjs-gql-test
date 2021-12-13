@@ -1,9 +1,11 @@
 import { Inject } from '@nestjs/common';
-import { Args, Resolver, Query, Context, ResolveReference, CONTEXT, ResolveField, Parent, ResolveProperty } from '@nestjs/graphql';
+import { Args, Resolver, Context, ResolveReference, CONTEXT, ResolveField, Parent, ResolveProperty } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
 import DataLoader from 'dataloader';
+import { OtelMethodCounter, OtelValueRecorder } from 'nestjs-otel';
 import { Episode, Movie, QueryTitle, Title, TvSeries } from 'src/gql/imdbDO';
 import { Loader } from 'src/intercept/data_loader';
+import { QueryWithMonitor } from 'src/utils';
 import { ImdbEpisodeLoader, ImdbService, ImdbTitleLoader, MongoQuery, MongoTitleType } from './imdb.service';
 
 @Resolver('Title')
@@ -21,7 +23,7 @@ export class ImdbResolver /* implements IQuery /* */ {
     return 'Movie';
   }
 
-  @Query('queryTitle')
+  @QueryWithMonitor('queryTitle')
   async queryTitle(@Args('query') queryTitle: QueryTitle): Promise<Title[]> {
     try {
       let mongoQuery = new MongoQuery();

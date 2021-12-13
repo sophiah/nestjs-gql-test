@@ -1,7 +1,8 @@
 import { Inject } from '@nestjs/common';
-import { Args, Resolver, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Resolver, ResolveField, Parent } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
 import DataLoader from 'dataloader';
+import { QueryWithMonitor } from 'src/utils';
 import { Author, Book } from 'src/gql/bookstoreDO';
 import { Loader } from 'src/intercept/data_loader';
 import { BookLoader } from '../book/book.service';
@@ -13,7 +14,7 @@ export class AuthorResolver  {
     private readonly authorService: AuthorService,
     ) {}
 
-  @Query('author')
+  @QueryWithMonitor('author')
   async author(
     @Args('author_id') id: string,
     @Loader(AuthorLoader) authorLoader: DataLoader<Author['author_id'], Author>

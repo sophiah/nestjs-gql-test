@@ -1,4 +1,4 @@
-import { Args, Resolver, Query, ResolveField, Parent, ResolveReference, CONTEXT } from '@nestjs/graphql';
+import { Args, Resolver, ResolveField, Parent, ResolveReference, CONTEXT } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
 import DataLoader from 'dataloader';
 import { lastValueFrom, take } from 'rxjs';
@@ -6,6 +6,7 @@ import { Author, Book } from 'src/gql/bookstoreDO';
 import { Loader } from 'src/intercept/data_loader';
 import { AuthorLoader } from '../author/author.service';
 import { BookLoader, BookService } from './book.service';
+import { QueryWithMonitor } from 'src/utils';
 
 @Resolver('Book')
 export class BookResolver /* implements IQuery /* */ {
@@ -13,7 +14,7 @@ export class BookResolver /* implements IQuery /* */ {
     private readonly bookService: BookService,
     ) {}
 
-  @Query('book')
+  @QueryWithMonitor('book')
   async getBook(
     @Args('book_id') id: string,
     @Loader(BookLoader) bookLoader: DataLoader<Book['book_id'], Book>
@@ -25,7 +26,7 @@ export class BookResolver /* implements IQuery /* */ {
     }
   }
 
-  @Query('books')
+  @QueryWithMonitor('books')
   async getBooks(): Promise<Book[]> {
     try {
       return await lastValueFrom(

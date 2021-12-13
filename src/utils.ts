@@ -1,6 +1,26 @@
 import { loadSchemaSync } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { GraphQLSchema } from 'graphql';
+import { applyDecorators } from '@nestjs/common';
+import { Query as GqlQuery } from '@nestjs/graphql';
+import { OtelMethodCounter, Span } from 'nestjs-otel';
+
+export function QueryWithMonitor(name: string) {
+  return applyDecorators(
+    Span(),
+    <MethodDecorator>OtelMethodCounter(),
+    GqlQuery(name),
+  );
+}
+
+export function DaoWithMonitor() {
+  return applyDecorators(
+    Span(),
+    <MethodDecorator>OtelMethodCounter(),
+  );
+}
+
+
 
 export function mapFromArray<T>(
   array: T[],

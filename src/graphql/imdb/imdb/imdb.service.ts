@@ -1,14 +1,13 @@
 import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
 import * as DataLoader from 'dataloader';
 import { Connection, Model, Schema } from 'mongoose';
-import { Episode, Movie, QueryTitle, Title, TitleType, TvSeries } from 'src/gql/imdbDO';
+import { Episode, QueryTitle, Title, TitleType, TvSeries } from 'src/gql/imdbDO';
 import { Document } from 'mongoose';
 import mongoose = require('mongoose');
 import { TitleBasicDocument, TitleBasicSchema } from './schema/TitleBasic';
 import { TitleEpisodeDocument, TitleEpisodeSchema } from './schema/TitleEpisode';
-import { mapFromArray } from 'src/utils';
+import { DaoWithMonitor } from 'src/utils';
 import { NestDataLoader } from 'src/intercept/data_loader';
-import { lastValueFrom } from 'rxjs';
 
 const IMDB_CONN_STR = process.env['IMDB_CONNSTR']
 const IMDB_DBNAME = 'imdb'
@@ -28,7 +27,7 @@ export class MongoQuery {
     this.titleTypes = titleTypes;
     this.count = count;
   }
-  
+ 
   composeFromQueryType(input: QueryTitle) {
     this.count = input.count;
     this.composeTitleType(input.titleType)
@@ -74,6 +73,7 @@ export class ImdbService implements OnModuleInit {
     return conn.model(name, schema);
   }
 
+  @DaoWithMonitor()
   public async queryTitle(query: MongoQuery): Promise<Title[]> {
     return this.getTitleBasicModel().then(model => model.aggregate(
       [
@@ -82,6 +82,7 @@ export class ImdbService implements OnModuleInit {
       ]));
   }
 
+  @DaoWithMonitor()
   public async queryEpisode(parentTitleIds: readonly string[]): Promise<Episode[]> {
     // parentTitleIds.forEach( x => input.push(x))
     return (await this.getTitleEpisodeModel()).find(
@@ -89,6 +90,7 @@ export class ImdbService implements OnModuleInit {
     )
   }
 
+  @DaoWithMonitor()
   public async queryByTitleIds(titleIds: readonly string[]): Promise<Title[]> {
     return (await this.getTitleBasicModel()).find(
       { tconst: {$in: titleIds.slice(0, titleIds.length)} }
