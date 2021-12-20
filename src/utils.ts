@@ -1,5 +1,8 @@
 // import { loadSchemaSync } from '@graphql-tools/load';
 // import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { Span, Counter } from '@metinseylan/nestjs-opentelemetry';
+import { applyDecorators } from '@nestjs/common';
+import { Query as GqlQuery } from '@nestjs/graphql';
 import { GraphQLSchema } from 'graphql';
 
 export function mapFromArray<T>(
@@ -27,6 +30,36 @@ export function getRandomArray(prefix, arrayLen, valLen) : string[] {
     rtn.push(prefix + '-' + newId(valLen));
   }
   return rtn
+}
+
+export function QueryWithMonitor(name: string) {
+  if (process.env.enableTracing) {
+    return applyDecorators(
+      Span(),
+      Counter(),
+      GqlQuery(name)
+    );
+  }
+  else {
+    return applyDecorators(
+      Counter(),
+      GqlQuery(name)
+    );
+  }
+}
+
+export function DaoWithMonitor() {
+  if (process.env.enableTracing) {
+    return applyDecorators(
+      Span(),
+      Counter()
+    );
+  }
+  else {
+    return applyDecorators(
+      Counter()
+    );
+  }
 }
 
 // export function loadSchemaFromDirectory(pathPrefix: string) : GraphQLSchema{

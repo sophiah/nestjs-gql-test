@@ -1,10 +1,10 @@
-import { Observer, Span } from '@metinseylan/nestjs-opentelemetry';
 import { Inject } from '@nestjs/common';
 import { Args, Resolver, Query, Context, ResolveReference, CONTEXT, ResolveField, Parent, ResolveProperty } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
 import DataLoader from 'dataloader';
 import { Episode, Movie, QueryTitle, Title, TvSeries } from 'src/gql/imdbDO';
 import { Loader } from 'src/intercept/data_loader';
+import { QueryWithMonitor } from 'src/utils';
 import { ImdbEpisodeLoader, ImdbService, ImdbTitleLoader, MongoQuery, MongoTitleType } from './imdb.service';
 
 @Resolver('Title')
@@ -22,8 +22,7 @@ export class ImdbResolver /* implements IQuery /* */ {
     return 'Movie';
   }
 
-  @Span()
-  @Query('queryTitle')
+  @QueryWithMonitor('queryTitle')
   async queryTitle(@Args('query') queryTitle: QueryTitle): Promise<Title[]> {
     try {
       let mongoQuery = new MongoQuery();
@@ -50,7 +49,6 @@ export class ImdbResolver /* implements IQuery /* */ {
 export class TvSeriesResolver {
   constructor() {}
 
-  @Span()
   @ResolveField('episodes')
   async episodes(
     @Parent() tvSeries: TvSeries,
@@ -64,7 +62,6 @@ export class TvSeriesResolver {
 export class EpisodeResolver {
   constructor() {}
 
-  @Span()
   @ResolveField('episodeDetail')
   async episodeDetail(
     @Parent() parent: Episode,

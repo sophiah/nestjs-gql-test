@@ -19,6 +19,10 @@ import { ConsoleMetricExporter } from '@opentelemetry/sdk-metrics-base';
     PageModule,
     OpenTelemetryModule.forRoot({
       spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
+      metricExporter: new PrometheusExporter({
+        endpoint: 'metrics',
+        port: 8081,
+      })
     }),
     // register graphql module
     GraphQLModule.forRootAsync({
