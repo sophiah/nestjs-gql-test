@@ -17,7 +17,7 @@ const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
       enable: true, // Includes api metrics
       timeBuckets: [], // You can change the default time buckets
       defaultLabels: { // You can set default labels for api metrics
-        custom: 'label'
+        custom: 'graphql'
       },
       ignoreRoutes: ['/favicon.ico'], // You can ignore specific routes (See https://docs.nestjs.com/middleware#excluding-routes for options)
       ignoreUndefinedRoutes: false, //Records metrics for all URLs, even undefined ones
@@ -35,7 +35,7 @@ const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
       useFactory: () => ({
         typePaths: [join(__dirname, '../gql/schema/**/*.graphql')], // schema
         playground: false, // iGraphQL UI, it will be deprecated
-        debug: true,
+        debug: false,
         plugins: [
           ApolloServerPluginLandingPageGraphQLPlayground(),
         ],

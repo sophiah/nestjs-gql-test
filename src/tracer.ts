@@ -1,20 +1,27 @@
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
-import { NodeSDK } from '@opentelemetry/sdk-node';
+import { NodeSDK, NodeSDKConfiguration } from '@opentelemetry/sdk-node';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import * as process from 'process';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
+import { OTLPMetricExporter, OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
+import { MeterProvider, ConsoleMetricExporter } from '@opentelemetry/metrics';
+import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
-const otelSDK = new NodeSDK({
-  metricExporter: new PrometheusExporter({
-    port: 8081,
+const _config: Partial<NodeSDKConfiguration> = {
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'graphql-service',
   }),
+  metricExporter: new PrometheusExporter({ port: 8081 }),
   metricInterval: 1000,
-  spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
   contextManager: new AsyncLocalStorageContextManager(),
-  instrumentations: [getNodeAutoInstrumentations()]
-});
+};
+
+if (process.env.enableTracing) {
+  _config.spanProcessor = new SimpleSpanProcessor(new OTLPTraceExporter())
+}
+
+const otelSDK = new NodeSDK(_config);
 
 export default otelSDK;
 // You can also use the shutdown method to gracefully shut down the SDK before process shutdown
