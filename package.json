@@ -38,6 +38,7 @@
     "@opentelemetry/api-metrics": "^0.25.0",
     "@opentelemetry/auto-instrumentations-node": "^0.25.0",
     "@opentelemetry/core": "^0.25.0",
+    "@opentelemetry/exporter-collector-grpc": "^0.25.0",
     "@opentelemetry/exporter-jaeger": "^0.25.0",
     "@opentelemetry/exporter-otlp-http": "^0.26.0",
     "@opentelemetry/exporter-prometheus": "^0.25.0",

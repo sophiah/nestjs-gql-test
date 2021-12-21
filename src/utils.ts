@@ -3,38 +3,20 @@ import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { GraphQLSchema } from 'graphql';
 import { applyDecorators } from '@nestjs/common';
 import { Query as GqlQuery } from '@nestjs/graphql';
-import { OtelMethodCounter, OtelValueRecorder, Span } from 'nestjs-otel';
+import { Span } from 'nestjs-otel';
 
 export function QueryWithMonitor(name: string) {
-  if (process.env.enableTracing) {
-    return applyDecorators(
-      Span(),
-      <MethodDecorator>OtelMethodCounter(),
-      <MethodDecorator>OtelValueRecorder(name),
-      GqlQuery(name),
-    );
-  }
-  else {
-    return applyDecorators(
-      <MethodDecorator>OtelMethodCounter(),
-      <MethodDecorator>OtelValueRecorder(name),
-      GqlQuery(name),
-    );
-  }
+  const decorators : MethodDecorator[] = [
+    Span(), GqlQuery(name)
+  ]
+  return applyDecorators(...decorators);
 }
 
 export function DaoWithMonitor() {
-  if (process.env.enableTracing) {
-    return applyDecorators(
-      Span(),
-      <MethodDecorator>OtelMethodCounter(),
-    );
-  }
-  else {
-    return applyDecorators(
-      <MethodDecorator>OtelMethodCounter(),
-    );
-  }
+  const decorators = [
+    Span()
+  ]
+  return applyDecorators(...decorators);
 }
 
 

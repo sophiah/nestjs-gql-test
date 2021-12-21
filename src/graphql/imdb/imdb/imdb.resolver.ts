@@ -23,7 +23,6 @@ export class ImdbResolver /* implements IQuery /* */ {
     return 'Movie';
   }
 
-  // @OtelValueRecorder('queryTitle')
   @QueryWithMonitor('queryTitle')
   async queryTitle(@Args('query') queryTitle: QueryTitle): Promise<Title[]> {
     try {
