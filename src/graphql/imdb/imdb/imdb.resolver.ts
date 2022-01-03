@@ -1,8 +1,9 @@
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { Args, Resolver, Context, ResolveReference, CONTEXT, ResolveField, Parent, ResolveProperty } from '@nestjs/graphql';
 import { UserInputError } from 'apollo-server-express';
 import DataLoader from 'dataloader';
 import { OtelMethodCounter, OtelValueRecorder } from 'nestjs-otel';
+import { CurrentUser } from 'src/auth';
 import { Episode, Movie, QueryTitle, Title, TvSeries } from 'src/gql/imdbDO';
 import { Loader } from 'src/intercept/data_loader';
 import { QueryWithMonitor } from 'src/utils';
@@ -24,8 +25,12 @@ export class ImdbResolver /* implements IQuery /* */ {
   }
 
   @QueryWithMonitor('queryTitle')
-  async queryTitle(@Args('query') queryTitle: QueryTitle): Promise<Title[]> {
+  async queryTitle(
+    @Args('query') queryTitle: QueryTitle,
+    @CurrentUser() user: string,
+  ): Promise<Title[]> {
     try {
+      console.log(user);
       let mongoQuery = new MongoQuery();
       mongoQuery.composeFromQueryType(queryTitle);
       const rtn: Title[] = [];

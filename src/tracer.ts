@@ -10,7 +10,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { CollectorTraceExporter, CollectorMetricExporter } from '@opentelemetry/exporter-collector-grpc';
 
-const traceCollectorOptions = { url: 'grpc://localhost:4317' };
+const traceCollectorOptions = { url:  process.env['OTLP_ENDPOINT'] || 'grpc://localhost:4317' };
 const spanExporter = new BatchSpanProcessor(new CollectorTraceExporter(traceCollectorOptions));
 // const spanExporter = new SimpleSpanProcessor(new OTLPTraceExporter());
 
