@@ -3,7 +3,7 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      "gql/**/*.graphql", "gql/**/*.gql"
+      "gql/**/*.graphql", "gql/**/*.gql", "grpc/**/*.proto"
     ]
   }
 }

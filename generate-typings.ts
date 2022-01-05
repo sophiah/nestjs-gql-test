@@ -15,3 +15,10 @@ definitionsFactory.generate({
   outputAs: 'class',
   federation: true,
 });
+
+definitionsFactory.generate({
+  typePaths: ['./src/gql/schema/goodread/*.graphql'],
+  path: './src/gql/goodread.ts',
+  outputAs: 'class',
+  federation: true,
+});

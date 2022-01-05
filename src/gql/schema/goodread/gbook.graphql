@@ -1,0 +1,20 @@
+type GBookAuthor {
+    author_id: ID!
+    role: String
+}
+
+type GBook {
+    book_id: ID!
+    title: String!
+    description: String
+    isbn: String
+    asin: String
+    link: String
+    avg_rating: Float
+    authors: [GBookAuthor]
+}
+
+
+extend type Query {
+    gbooks(book_ids: [ID!]): [GBook]
+}

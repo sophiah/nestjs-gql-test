@@ -1,0 +1,9 @@
+type GAuthor {
+    author_id: ID
+    name: String
+    avg_rating: Float
+}
+
+extend type Query {
+    gauthors(author_ids: [ID!]): [GAuthor]
+}

@@ -1,0 +1,8 @@
+
+extend type GAuthor {
+  books: [GBook!]
+}
+
+extend type GBookAuthor {
+  author: GAuthor
+}

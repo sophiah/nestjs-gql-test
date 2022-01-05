@@ -8,6 +8,7 @@ import { BookstoreModule } from './graphql/bookstore/bookstore.module';
 import { ImdbModule } from './graphql/imdb/imdb.module';
 import { PageModule } from './pages/page.module';
 import { OpenTelemetryModule } from 'nestjs-otel'
+import { GoodreadModule } from './graphql/goodread/goodread.module';
 
 const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
   metrics: {
@@ -31,7 +32,7 @@ const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
     OpenTelemetryModuleConfig,
     // register graphql module
     GraphQLModule.forRootAsync({
-      imports: [BookstoreModule, ImdbModule],
+      imports: [BookstoreModule, ImdbModule, GoodreadModule],
       useFactory: () => ({
         typePaths: [join(__dirname, '../gql/schema/**/*.graphql')], // schema
         playground: false, // iGraphQL UI, it will be deprecated
