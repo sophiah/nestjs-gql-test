@@ -3,6 +3,8 @@ WORKDIR  /pkg
 
 ENV IMDB_CONNSTR=""
 ENV OTLP_ENDPOINT=""
+ENV AUTHOR_SERVICE=""
+ENV BOOK_SERVICE=""
 
 COPY     package.json /pkg/
 COPY     . .

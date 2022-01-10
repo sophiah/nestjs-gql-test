@@ -1,4 +1,6 @@
-
+docker-build-local:
+	docker build -t nest-gql-test .
+	
 docker-build:
 	docker buildx build \
 		--platform linux/amd64 \
