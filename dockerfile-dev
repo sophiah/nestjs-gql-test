@@ -1,0 +1,19 @@
+FROM     node:14.18.2 as builder
+WORKDIR  /app
+
+ENV IMDB_CONNSTR=""
+ENV OTLP_ENDPOINT=""
+ENV AUTHOR_SERVICE=""
+ENV BOOK_SERVICE=""
+
+RUN apt-get update && apt-get install telnet
+
+COPY  package.json /app
+COPY  nest-cli.json /app
+COPY  tsconfig.build.json /app
+COPY  tsconfig.json /app
+
+COPY  src/ /app/src
+
+EXPOSE   8080
+CMD      ["tail", "-f", "/dev/null"]
