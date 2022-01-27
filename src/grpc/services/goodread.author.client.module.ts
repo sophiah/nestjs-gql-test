@@ -14,6 +14,10 @@ import { GOODREAD_AUTHOR_PACKAGE_NAME } from '../typings/author';
           url: process.env['AUTHOR_SERVICE'] || 'localhost:8082',
           package: [GOODREAD_AUTHOR_PACKAGE_NAME],
           protoPath: [join(__dirname, '../../../grpc/protos/author.proto')],
+          keepalive: {
+            keepaliveTimeMs: 300*1000,
+            keepalivePermitWithoutCalls: 300*1000,
+          }
         },
       },
     ]),

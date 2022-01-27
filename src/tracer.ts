@@ -9,22 +9,25 @@ import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { CollectorTraceExporter, CollectorMetricExporter } from '@opentelemetry/exporter-collector-grpc';
+import { SpanPrometheusExporter } from './opentelemetry';
 
-const traceCollectorOptions = { url:  process.env['OTLP_ENDPOINT'] || 'grpc://localhost:4317' };
-const spanExporter = new BatchSpanProcessor(new CollectorTraceExporter(traceCollectorOptions));
+// const traceCollectorOptions = { url:  process.env['OTLP_ENDPOINT'] || 'grpc://localhost:4317' };
+// const spanExporter = new BatchSpanProcessor(new CollectorTraceExporter(traceCollectorOptions));
 // const spanExporter = new SimpleSpanProcessor(new OTLPTraceExporter());
+
+const spanExporter = new BatchSpanProcessor(
+  new SpanPrometheusExporter({
+    service: 'test-gql',
+    port: 9002,
+  }),
+);
 
 const _config: Partial<NodeSDKConfiguration> = {
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: 'graphql-service',
   }),
-  metricExporter: new PrometheusExporter({port: 9000}),
   spanProcessor: spanExporter,
   contextManager: new AsyncLocalStorageContextManager(),
-}
-
-if (process.env.enableTracing) {
-  _config.instrumentations = [getNodeAutoInstrumentations()]
 }
 
 const otelSDK = new NodeSDK(_config);
