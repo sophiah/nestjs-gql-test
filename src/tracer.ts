@@ -18,6 +18,7 @@ const _config: Partial<NodeSDKConfiguration> = {
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: 'graphql-service',
   }),
+  metricExporter: new PrometheusExporter({port: 9000}),
   spanProcessor: spanExporter,
   contextManager: new AsyncLocalStorageContextManager(),
 }
