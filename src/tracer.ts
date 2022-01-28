@@ -13,7 +13,7 @@ import { SpanPrometheusExporter } from './opentelemetry';
 
 // const traceCollectorOptions = { url:  process.env['OTLP_ENDPOINT'] || 'grpc://localhost:4317' };
 // const spanExporter = new BatchSpanProcessor(new CollectorTraceExporter(traceCollectorOptions));
-// const spanExporter = new SimpleSpanProcessor(new OTLPTraceExporter());
+// const spanExporter = new SimpleSpanProcessor(new ConsoleSpanExporter());
 
 const spanExporter = new BatchSpanProcessor(
   new SpanPrometheusExporter({
@@ -28,6 +28,7 @@ const _config: Partial<NodeSDKConfiguration> = {
   }),
   spanProcessor: spanExporter,
   contextManager: new AsyncLocalStorageContextManager(),
+  // instrumentations: [getNodeAutoInstrumentations()]
 }
 
 const otelSDK = new NodeSDK(_config);

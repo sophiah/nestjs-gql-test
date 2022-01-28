@@ -19,9 +19,10 @@ import { GoodreadModule } from './graphql/goodread/goodread.module';
         typePaths: [join(__dirname, '../gql/schema/**/*.graphql')], // schema
         playground: false, // iGraphQL UI, it will be deprecated
         debug: false,
-        plugins: [
-          ApolloServerPluginLandingPageGraphQLPlayground(),
-        ],
+        cors: false,
+        // plugins: [
+        //   ApolloServerPluginLandingPageGraphQLPlayground(),
+        // ],
         context: () => ({
           // additional context
         }),

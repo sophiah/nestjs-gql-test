@@ -9,6 +9,12 @@ import { BookResolver } from 'src/graphql/bookstore/book/book.resolver';
 import { AuthorService } from 'src/graphql/bookstore/author/author.service';
 import { BookService } from 'src/graphql/bookstore/book/book.service';
 import { request, gql, GraphQLClient } from 'graphql-request'
+import { Loader } from 'src/intercept/data_loader';
+import { GAuthorsLoader } from 'src/graphql/goodread/goodread.dataloader';
+import DataLoader from 'dataloader';
+import { Author, Authors } from 'src/grpc/typings/author';
+import { GAuthor } from 'src/gql/goodread';
+import { AuthorClient } from 'src/grpc/services/goodread.author.client';
 
 const testQuery = `query bookstore ($book_id: ID!, $author_id: ID!) {
   book(book_id: $book_id) {
@@ -28,38 +34,38 @@ const client = new GraphQLClient("http://localhost:8080/graphql", {
 
 @Controller('/page')
 export class PageController {
+  constructor(private readonly authorClient: AuthorClient) {
+  }
 
   /*
   There is an article: https://stackoverflow.com/questions/63766387/how-to-invoke-a-query-using-graphql-tools
   It can invoke graphql, but didn't know how to mapping resolvers in this architecture
   */
   @Get("/page-test1")
-  async getPage1(): Promise<Object> {
-    const x_typedef = loadTypedefsSync(join(__dirname, '../../gql/schema/**/*.graphql'), {
-      loaders: [new GraphQLFileLoader()]
-    }).map( x => x.document)
+  async gauthors(
+    @Loader(GAuthorsLoader) authorLoader: DataLoader<string, Author>
+  ): Promise<GAuthor[]> {
+    return (await authorLoader.loadMany(["1077326"])).map( x => {
+      const r = new GAuthor();
+      const a = <Author>(x);
+      r.author_id = a.authorId;
+      r.name = a.name;
+      r.avg_rating = a.averageRating;
+      return r;
+    });
+  }
 
-    // console.log(x_typedef)
-
-    const schema = makeExecutableSchema({
-      typeDefs: x_typedef,
-      /* not sure how to map resolver.? */
-      resolvers: {'Author': new AuthorResolver(new AuthorService()), 'Book': new BookResolver(new BookService())},
-      resolverValidationOptions: { 
-        requireResolversToMatchSchema: 'ignore'
-      }
-    })
-    
-    let args : GraphQLArgs = {
-      schema: schema, 
-      source: testQuery,
-      variableValues: {"author_id": "12345", "book_id": "56789"}
-    }
-    graphql(args).then(data => {
-      // null currently. need to verify
-      console.log(data);
-    })
-    return {"test": "page1"};
+  @Get("/page-test2")
+  async test2(): Promise<GAuthor[]> {
+    const authors: Authors= await (this.authorClient.getAuthors(["1077326"]));
+    return authors.authors.map( x => {
+      const r = new GAuthor();
+      const a = <Author>(x);
+      r.author_id = a.authorId;
+      r.name = a.name;
+      r.avg_rating = a.averageRating;
+      return r;
+    });
   }
 
   @Get("/gql-client")

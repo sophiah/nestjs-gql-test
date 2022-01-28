@@ -48,13 +48,15 @@ export class PrometheusAttributesBatcher {
     const attrs = {};
     attrs['service'] = this._service;
     Object.keys(span.attributes).forEach((k) => {
-      attrs[k] = span.attributes[k].toString();
+      if (! k.startsWith('http.') && !k.startsWith('net.')) {
+        attrs[k] = span.attributes[k].toString();
+      }
     });
     return attrs;
   }
 
   private async spanDuration(span: ReadableSpan): Promise<void> {
-    const histogram_name = span.name.replace('/', '_');
+    const histogram_name = span.name.replace('/', '_').replace(' ', '');
     let histogram: Histogram = this._histogram.get(histogram_name);
     if (histogram == undefined) {
       histogram = this._meter.createHistogram(histogram_name, {

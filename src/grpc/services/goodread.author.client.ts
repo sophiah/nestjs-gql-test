@@ -2,6 +2,7 @@ import { lastValueFrom } from 'rxjs';
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as IAuthor from '../typings/author';
+import { DaoWithMonitor } from 'src/utils';
 
 @Injectable()
 export class AuthorClient implements OnModuleInit {
@@ -15,6 +16,7 @@ export class AuthorClient implements OnModuleInit {
     );
   }
 
+  @DaoWithMonitor()
   public async getAuthors(author_ids: readonly string[]): Promise<IAuthor.Authors> {
     try {
       const req = {} as IAuthor.GetAuthorByIdsRequest;
