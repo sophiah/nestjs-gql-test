@@ -11,17 +11,20 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { CollectorTraceExporter, CollectorMetricExporter } from '@opentelemetry/exporter-collector-grpc';
 import { SpanPrometheusExporter } from './opentelemetry';
 
-// const traceCollectorOptions = { url:  process.env['OTLP_ENDPOINT'] || 'grpc://localhost:4317' };
-// const spanExporter = new BatchSpanProcessor(new CollectorTraceExporter(traceCollectorOptions));
+let spanExporter;
 // const spanExporter = new SimpleSpanProcessor(new ConsoleSpanExporter());
-
-const spanExporter = new BatchSpanProcessor(
-  new SpanPrometheusExporter({
-    service: 'test-gql',
-    histogramBoundries: [30, 50, 70, 100, 200, 300, 500, 750, 900, 1100, 1500, 1700, 2000, 2500, 3000, 3500],
-    port: 9002,
-  }),
-);
+if (process.env['SPAN_EXPORTER'] == 'OLTP') {
+  const traceCollectorOptions = { url:  process.env['OTLP_ENDPOINT'] || 'grpc://localhost:4317' };
+  spanExporter = new BatchSpanProcessor(new CollectorTraceExporter(traceCollectorOptions));
+} else {
+  spanExporter = new BatchSpanProcessor(
+    new SpanPrometheusExporter({
+      service: 'test-gql',
+      histogramBoundries: [30, 50, 70, 100, 200, 300, 500, 750, 900, 1100, 1500, 1700, 2000, 2500, 3000, 3500],
+      port: 9001,
+    }),
+  );
+}
 
 const _config: Partial<NodeSDKConfiguration> = {
   resource: new Resource({
@@ -29,7 +32,7 @@ const _config: Partial<NodeSDKConfiguration> = {
   }),
   spanProcessor: spanExporter,
   contextManager: new AsyncLocalStorageContextManager(),
-  // instrumentations: [getNodeAutoInstrumentations()]
+  instrumentations: (process.env['AUTO_INTROMENT'] == 'on') ? [getNodeAutoInstrumentations()] : []
 }
 
 const otelSDK = new NodeSDK(_config);
