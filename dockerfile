@@ -5,7 +5,8 @@ ENV IMDB_CONNSTR=""
 ENV OTLP_ENDPOINT=""
 ENV AUTHOR_SERVICE=""
 ENV BOOK_SERVICE=""
-ENV enableTracing=""
+ENV SPAN_EXPORTER=""
+ENV AUTO_INTROMENT=""
 
 COPY     package.json /pkg/
 COPY     . .
