@@ -1,8 +1,9 @@
 import { Injectable, Scope } from "@nestjs/common";
 import * as DataLoader from "dataloader";
+import { from, lastValueFrom } from "rxjs";
+import { Author, Authors } from "src/grpc/serviceNew/author_pb";
 import { AuthorClient } from "src/grpc/services/goodread.author.client";
 import { BookClient } from "src/grpc/services/goodread.book.client";
-import { Author, Authors } from "src/grpc/typings/author";
 import { Book, BookList } from "src/grpc/typings/book";
 import { NestDataLoader } from "src/intercept/data_loader";
 
@@ -13,9 +14,9 @@ export class GAuthorsLoader implements NestDataLoader<string, Author> {
 
   generateDataLoader(): DataLoader<string, Author, string> {
     return new DataLoader<string, Author>(async ids => {
-        const authors: Authors= await (this.authorClient.getAuthors(ids));
-        const _idMap = new Map(authors.authors.map( x => [x.authorId, x]));
-        return ids.map( id => _idMap.get(id));
+      const authors: Authors= await lastValueFrom(from(this.authorClient.getAuthors(ids)));
+      const _idMap = new Map(authors.getAuthorsList().map( x => [x.getAuthorId(), x]));
+      return ids.map( id => _idMap.get(id));
     });
   }
 }

@@ -1,0 +1,1 @@
+{"query":"query goodread { gauthors(author_ids: [\"1077326\"]) { author_id, name, avg_rating } }","variables":{}}

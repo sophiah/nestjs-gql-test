@@ -18,6 +18,7 @@ import { SpanPrometheusExporter } from './opentelemetry';
 const spanExporter = new BatchSpanProcessor(
   new SpanPrometheusExporter({
     service: 'test-gql',
+    histogramBoundries: [30, 50, 70, 100, 200, 300, 500, 750, 900, 1100, 1500, 1700, 2000, 2500, 3000, 3500],
     port: 9002,
   }),
 );

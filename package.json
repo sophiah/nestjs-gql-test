@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "nest build; cp -R src/grpc/serviceNew/ dist/src/grpc/serviceNew/",
     "build:resource": "./node_modules/.bin/ts-node generate-typings",
     "clean": "rimraf dist",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -1,0 +1,1 @@
+{"query":"query imdb {pastBuy: queryTitle(query: {count: 5, titleType: [TVSHOW, MOVIE]}) {tconst, titleType, primaryTitle, originalTitle }}","variables":{}}

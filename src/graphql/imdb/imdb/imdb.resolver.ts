@@ -30,7 +30,6 @@ export class ImdbResolver /* implements IQuery /* */ {
     @CurrentUser() user: string,
   ): Promise<Title[]> {
     try {
-      console.log(user);
       let mongoQuery = new MongoQuery();
       mongoQuery.composeFromQueryType(queryTitle);
       const rtn: Title[] = [];

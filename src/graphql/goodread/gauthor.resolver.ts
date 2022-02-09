@@ -6,8 +6,8 @@ import { QueryWithMonitor } from 'src/utils';
 import { GAuthor, GBook, GBookAuthor } from 'src/gql/goodread';
 import { Loader } from 'src/intercept/data_loader';
 import { GAuthorBooksLoader, GAuthorsLoader} from './goodread.dataloader';
-import { Author} from 'src/grpc/typings/author';
 import { Book } from 'src/grpc/typings/book';
+import { Author } from 'src/grpc/serviceNew/author_pb';
 
 @Resolver('GAuthor')
 export class GAuthorResolver {
@@ -22,9 +22,9 @@ export class GAuthorResolver {
       return (await authorLoader.loadMany(author_ids)).map( x => {
         const r = new GAuthor();
         const a = <Author>(x);
-        r.author_id = a.authorId;
-        r.name = a.name;
-        r.avg_rating = a.averageRating;
+        r.author_id = a.getAuthorId();
+        r.name = a.getName();
+        r.avg_rating = a.getAverageRating();
         return r;
       });
     } catch (err) {
