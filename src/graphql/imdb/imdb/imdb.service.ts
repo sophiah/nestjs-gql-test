@@ -51,7 +51,7 @@ export class ImdbService implements OnModuleInit {
   constructor(
     private readonly mongoseConn: Connection = mongoose.createConnection(IMDB_CONN_STR)
   ) {
-    this.mongoseConn.useDb(IMDB_DBNAME)
+    this.mongoseConn = this.mongoseConn.useDb(IMDB_DBNAME)
   }
 
   private titleBasicModel = null
