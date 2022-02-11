@@ -49,7 +49,10 @@ export class ImdbService implements OnModuleInit {
   }
 
   constructor(
-    private readonly mongoseConn: Connection = mongoose.createConnection(IMDB_CONN_STR)
+    private readonly mongoseConn: Connection = mongoose.createConnection(IMDB_CONN_STR, {
+      user: process.env['IMDB_USER'],
+      pass: process.env['IMDB_PASS'],
+    })
   ) {
     this.mongoseConn = this.mongoseConn.useDb(IMDB_DBNAME)
   }
