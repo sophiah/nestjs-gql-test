@@ -10,7 +10,7 @@ import { DaoWithMonitor } from 'src/utils';
 import { NestDataLoader } from 'src/intercept/data_loader';
 
 const IMDB_CONN_STR = process.env['IMDB_CONNSTR']
-const IMDB_DBNAME = 'imdb'
+const IMDB_DBNAME = process.env['IMDB_DB'] || 'imdb'
 const COLLECTION_TITLE_BASIC = 'title_basic'
 
 export class MongoTitleType {
@@ -50,7 +50,9 @@ export class ImdbService implements OnModuleInit {
 
   constructor(
     private readonly mongoseConn: Connection = mongoose.createConnection(IMDB_CONN_STR)
-  ) {}
+  ) {
+    this.mongoseConn.useDb(IMDB_DBNAME)
+  }
 
   private titleBasicModel = null
   private async getTitleBasicModel (): Promise<Model<TitleBasicDocument>> {
